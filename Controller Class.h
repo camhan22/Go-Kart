@@ -1,3 +1,24 @@
+/*
+Author: Cameron Hanson
+Author Email: hansoncameron18@yahoo.com
+Description: Raspberry Pi main controller for an electric go-kart with custom motor controllers
+ 
+Revision #: 1.0
+Revision Release Date: 
+
+Revision History:
+1.0 - Inital Release
+
+
+Things to add/update:
+
+*/
+
+#ifndef i2c-dev.h //If the I2C library isn't defined, then define it
+	#include <i2c-dev.h>
+#endif
+
+
 class Motor_Controller
 {
 private:	//Section to hold variables
