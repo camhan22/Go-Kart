@@ -28,6 +28,13 @@ byte Throttle_1_Value = 0; //Percentage from Throttle 1
 byte Throttle_2_Value = 0; //Percentage for Throttle 2
 //These will be used to check if there is a problem (redundancy since it is electric and not mechanically linked)
 
+double T1_Min = 0;
+double T1_Max = 1.304;
+double T2_Min = 3.674;
+double T2_Max = 4.996;
+
+double Vcc = 4.996;
+
 byte ThrottlePercent = 0; // Holds the throttle percentage for the motors
 byte Throttle_Status = 0; // Holds the status of the controller, tells if there was an error or not
 byte Tolerance = 5; //Tolerance in percent. Meaning they cannot differ by more than this amount
@@ -50,11 +57,11 @@ void setup() {
 
 void loop() {
   if (digitalRead(Direction_Pin) == 1) {
-    Throttle_1_Value = map(analogRead(Throttle_1_Pin), 0, Max_Val, 0, 100); //Map input 1 to 0-100%
-    Throttle_2_Value = map(analogRead(Throttle_2_Pin), 0, Max_Val, 0, 100); //Map input 2 to 0-100%
+    Throttle_1_Value = map(analogRead(Throttle_1_Pin), T1_Min*1023/Vcc, T1_Max*1023/Vcc, 0, 100); //Map input 1 to 0-100%
+    Throttle_2_Value = map(analogRead(Throttle_2_Pin), T2_Min*1023/Vcc, T2_Max*1023/Vcc, 0, 100); //Map input 2 to 0-100%
   } else { // Otherwise it is pulled low and the mapping should occur in reverse. Thus 1023 should map to 0% and 0 should map to 100%
-    Throttle_1_Value = map(analogRead(Throttle_1_Pin), 0, Max_Val, 100, 0); //Map input 1 to 0-100%
-    Throttle_2_Value = map(analogRead(Throttle_2_Pin), 0, Max_Val, 100, 0); //Map input 2 to 0-100%
+    Throttle_1_Value = map(analogRead(Throttle_1_Pin), T1_Max*1023/Vcc, T1_Min*1023/Vcc, 100, 0); //Map input 1 to 0-100%
+    Throttle_2_Value = map(analogRead(Throttle_2_Pin), T2_Max*1023/Vcc, T2_Min*1023/Vcc, 100, 0); //Map input 2 to 0-100%
   }
 
   //FAULTS
