@@ -20,6 +20,7 @@
 #define Throttle_2_Pin A2 //PB3 and PB4
 //Left pot in normal orientation is throttle_1 and right pot is throttle_2
 
+#define Max_Val = 1023 //Defines the maximum value that will be read by the pots (T1 Max = 1.304 Min = 0) (T2 Max =  4.996 Min = 3.674)
 #define Direction_Pin 1 //Pin the direction reversing occurs on
 
 //Holds the value that each throttle sees
@@ -49,11 +50,11 @@ void setup() {
 
 void loop() {
   if (digitalRead(Direction_Pin) == 1) {
-    Throttle_1_Value = map(analogRead(Throttle_1_Pin), 0, 1023, 0, 100); //Map input 1 to 0-100%
-    Throttle_2_Value = map(analogRead(Throttle_2_Pin), 0, 1023, 0, 100); //Map input 2 to 0-100%
+    Throttle_1_Value = map(analogRead(Throttle_1_Pin), 0, Max_Val, 0, 100); //Map input 1 to 0-100%
+    Throttle_2_Value = map(analogRead(Throttle_2_Pin), 0, Max_Val, 0, 100); //Map input 2 to 0-100%
   } else { // Otherwise it is pulled low and the mapping should occur in reverse. Thus 1023 should map to 0% and 0 should map to 100%
-    Throttle_1_Value = map(analogRead(Throttle_1_Pin), 0, 1023, 100, 0); //Map input 1 to 0-100%
-    Throttle_2_Value = map(analogRead(Throttle_2_Pin), 0, 1023, 100, 0); //Map input 2 to 0-100%
+    Throttle_1_Value = map(analogRead(Throttle_1_Pin), 0, Max_Val, 100, 0); //Map input 1 to 0-100%
+    Throttle_2_Value = map(analogRead(Throttle_2_Pin), 0, Max_Val, 100, 0); //Map input 2 to 0-100%
   }
 
   //FAULTS
@@ -67,7 +68,7 @@ void loop() {
   }
   //Checks if any of the pots has a broken connection
   else if(Throttle_2_Value < 100-Tolerance && Throttle_2_Value > 0+Tolerance && Throttle_1_Value == 100){ 
-    //If the first throttle is somewhere between 0 and 100 but the other is pegged at 0, the second throttle has a broken ground connection
+    //If the first throttle is somewhere between 0 and 100 but the other is pegged at 0, the first throttle has a broken ground connection
     fault = 1;
     if(digitalRead(Direction_Pin) == 1){
       Controller_Status = 2;
@@ -75,7 +76,7 @@ void loop() {
       Controller_Status = 8;
     }
   }else if(Throttle_2_Value < 100-Tolerance && Throttle_2_Value > 0+Tolerance && Throttle_1_Value == 0){ 
-    //If the first throttle is somewhere between 0 and 100 but the other is pegged at 0, the second throttle has a broken power connection
+    //If the first throttle is somewhere between 0 and 100 but the other is pegged at 0, the first throttle has a broken power connection
     fault = 1;
     if(digitalRead(Direction_Pin) == 1){
       Controller_Status = 3;

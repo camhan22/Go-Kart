@@ -53,22 +53,22 @@ L Device:R_POT RV1
 U 1 1 60C8211D
 P 2050 3150
 F 0 "RV1" H 1981 3196 50  0000 R CNN
-F 1 "Throttle_1" H 1981 3105 50  0000 R CNN
+F 1 "Throttle_1/Left" H 1981 3105 50  0000 R CNN
 F 2 "" H 2050 3150 50  0001 C CNN
 F 3 "~" H 2050 3150 50  0001 C CNN
 	1    2050 3150
-	1    0    0    -1  
+	1    0    0    1   
 $EndComp
 $Comp
 L Device:R_POT RV2
 U 1 1 60C827CD
 P 2050 3950
 F 0 "RV2" H 1981 3996 50  0000 R CNN
-F 1 "Throttle_2" H 1981 3905 50  0000 R CNN
+F 1 "Throttle_2/Right" H 1981 3905 50  0000 R CNN
 F 2 "" H 2050 3950 50  0001 C CNN
 F 3 "~" H 2050 3950 50  0001 C CNN
 	1    2050 3950
-	1    0    0    -1  
+	1    0    0    1   
 $EndComp
 $Comp
 L power:GND #PWR03
@@ -313,4 +313,8 @@ Wire Wire Line
 	4950 3550 4950 3400
 Wire Wire Line
 	4950 3400 4850 3400
+Text Notes 2250 3150 0    50   ~ 0
+22 - WHT
+Text Notes 2250 3950 0    50   ~ 0
+22 - YLW
 $EndSCHEMATC
