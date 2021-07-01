@@ -1,0 +1,1 @@
+Average full throttle acceleration is 6.1535g. (May need to limit the acceleration rate for this system)
