@@ -31,8 +31,8 @@ public:	//Section to hold methods, gets ,and sets
   
   void Motor_Controller (int address){	  //Constructor to intialize the system
 	this.Address = address;
-	this.Direction = 1;
-	this.Speed = 0;
+	this.Direction = 1; //This corresponds to the forward direction
+	this.Speed = 0; //Start with a speed of 0
   }
 
   //Getters and setters for the private variables
@@ -71,6 +71,7 @@ public:	//Section to hold methods, gets ,and sets
   }
   
   int SendSpeedandDirection(){ //Sends the current speed and direction to the motor controller
+	int error_num = 0; //Assume everything is okay for now
 	
 		
 	

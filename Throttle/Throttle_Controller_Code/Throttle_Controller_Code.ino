@@ -23,6 +23,8 @@
 #define Max_Val = 1023 //Defines the maximum value that will be read by the pots
 #define Direction_Pin 1 //Pin the direction reversing occurs on
 
+#define Address 8 //Define the address that will be used for the throttle
+
 //Holds the value that each throttle sees
 int Throttle_1_Value = 0; //Percentage from Throttle 1
 int Throttle_2_Value = 0; //Percentage for Throttle 2
@@ -51,7 +53,7 @@ void setup() {
   pinMode(Throttle_2_Pin, INPUT);
   pinMode(Direction_Pin, INPUT_PULLUP); //This pin is normally high, but can be pulled low with the jumper
 
-  Wire.begin(8); //join i2c bus with address #8 (Doesn't matter as long as it isn't 0-7)
+  Wire.begin(Address); //join i2c bus with address #8 (Doesn't matter as long as it isn't 0-7)
   Wire.onRequest(requestEvent); //register event for when input is requested by the main controller
 
   Controller_Status = 16; //System is calibrating
@@ -134,13 +136,11 @@ void loop() {
     Throttle_Percent = (Throttle_1_Value + Throttle_2_Value) / 2;
     Controller_Status = 0;
   }
-  delay(200); //Only allow this value to update every 200ms
+  delay(20); //Only allow this value to update every 200ms
 }
 
 //Executes when the main controller askes for data. It will request 2 bytes. The first being the throttle data and the second being the throttle status
 void requestEvent() {
-  //Wire.write(Throttle_Percent); //Write the throttle percentage to the main controller
-  //Wire.write(Controller_Status); //Write the status of the throttle controller to know if there were any errors
   Wire.write(Throttle_Percent);
   Wire.write(Controller_Status);
 }
