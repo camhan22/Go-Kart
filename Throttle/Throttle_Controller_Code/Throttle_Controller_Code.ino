@@ -136,7 +136,7 @@ void loop() {
     Throttle_Percent = (Throttle_1_Value + Throttle_2_Value) / 2;
     Controller_Status = 0;
   }
-  delay(20); //Only allow this value to update every 200ms
+  delay(10); //Only allow this value to update every 10ms
 }
 
 //Executes when the main controller askes for data. It will request 2 bytes. The first being the throttle data and the second being the throttle status
