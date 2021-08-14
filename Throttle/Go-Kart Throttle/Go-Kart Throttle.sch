@@ -285,19 +285,6 @@ Text GLabel 4200 1250 0    50   Input ~ 0
 Orientation
 Wire Wire Line
 	4200 1250 4300 1250
-$Comp
-L power:GND #PWR?
-U 1 1 60CAF6E6
-P 4450 1600
-F 0 "#PWR?" H 4450 1350 50  0001 C CNN
-F 1 "GND" H 4455 1427 50  0000 C CNN
-F 2 "" H 4450 1600 50  0001 C CNN
-F 3 "" H 4450 1600 50  0001 C CNN
-	1    4450 1600
-	-1   0    0    -1  
-$EndComp
-Wire Wire Line
-	4450 1500 4450 1600
 Text GLabel 5200 3400 2    50   Input ~ 0
 Orientation
 Wire Wire Line
@@ -317,4 +304,33 @@ Text Notes 2250 3150 0    50   ~ 0
 22 - WHT
 Text Notes 2250 3950 0    50   ~ 0
 22 - YLW
+$Comp
+L Device:R R?
+U 1 1 611701B3
+P 4600 1700
+F 0 "R?" V 4393 1700 50  0000 C CNN
+F 1 "10k" V 4484 1700 50  0000 C CNN
+F 2 "" V 4530 1700 50  0001 C CNN
+F 3 "~" H 4600 1700 50  0001 C CNN
+	1    4600 1700
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR?
+U 1 1 611706DF
+P 4850 1750
+F 0 "#PWR?" H 4850 1500 50  0001 C CNN
+F 1 "GND" H 4855 1577 50  0000 C CNN
+F 2 "" H 4850 1750 50  0001 C CNN
+F 3 "" H 4850 1750 50  0001 C CNN
+	1    4850 1750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	4750 1700 4850 1700
+Wire Wire Line
+	4850 1700 4850 1750
+Wire Wire Line
+	4450 1500 4450 1700
+NoConn ~ 4450 1000
 $EndSCHEMATC

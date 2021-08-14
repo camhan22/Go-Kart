@@ -2,10 +2,11 @@
   Author: Cameron Hanson
   Author Email: hansoncameron18@yahoo.com
 
-  Revision #: 1.2
+  Revision #: 2.0
   Revision Release Date: 06/20/2021
 
   Revision History:
+  2.0 - Added eeprom to store calibration data and made it so if the system starts with the throttle at full, then a calibration will occur
   1.2 - Added fault codes to tell alert the user if a wire has failed on the pots and which one. Also added a reset function from the I2C bus
   1.1 - Added direction header that way the system can function even when mounted backwards.
   1.0 - Initial Release
@@ -15,6 +16,15 @@
 */
 //INCLUDES//
 #include <Wire.h>
+#include <EEPROM.h>
+
+//EEPROM MAP
+//Address  Meaning
+//   0     calibration good
+//   1     T1_Cal_Min
+//   2     T1_Cal_Max
+//   3     T2_Cal_Min
+//   4     T2_Cal_Max 
 
 #define Throttle_1_Pin A3 //Define the pins the throttles are attached to
 #define Throttle_2_Pin A2 //PB3 and PB4
@@ -53,29 +63,65 @@ void setup() {
   pinMode(Throttle_2_Pin, INPUT);
   pinMode(Direction_Pin, INPUT_PULLUP); //This pin is normally high, but can be pulled low with the jumper
 
+  if(analogRead(Throttle_1_Pin) > 450 && analogRead(Throttle_2_Pin) > 950){ //If the throttle is at full, then that signals a calibration is needed on reset
+    EEPROM.write(0,255);
+  }
+
   Wire.begin(Address); //join i2c bus with address #8 (Doesn't matter as long as it isn't 0-7)
   Wire.onRequest(requestEvent); //register event for when input is requested by the main controller
 
   Controller_Status = 16; //System is calibrating
+  if (EEPROM.read(0) == 255) { //Only do this is calibration is needed. Will need to figure out the condition for calibration
+    int start_time = millis();
+    while (millis() - start_time < 5000) {
+      Throttle_1_Value = analogRead(Throttle_1_Pin);
+      Throttle_2_Value = analogRead(Throttle_2_Pin);
 
-  int start_time = millis();
-  while (millis() - start_time < 5000) {
-    Throttle_1_Value = analogRead(Throttle_1_Pin);
-    Throttle_2_Value = analogRead(Throttle_2_Pin);
+      if (Throttle_1_Value < T1_Cal_Min) {
+        T1_Cal_Min = Throttle_1_Value;
+      } else if (Throttle_1_Value > T1_Cal_Max) {
+        T1_Cal_Max = Throttle_1_Value;
+      }
 
-    if (Throttle_1_Value < T1_Cal_Min) {
-      T1_Cal_Min = Throttle_1_Value;
-    } else if (Throttle_1_Value > T1_Cal_Max) {
-      T1_Cal_Max = Throttle_1_Value;
+      if (Throttle_2_Value < T2_Cal_Min) {
+        T2_Cal_Min = Throttle_2_Value;
+      } else if (Throttle_2_Value > T2_Cal_Max) {
+        T2_Cal_Max = Throttle_2_Value;
+      }
     }
+    //Write the values to eeprom
+    EEPROM.write(1, highByte(T1_Cal_Min));
+    EEPROM.write(2, lowByte(T1_Cal_Min));
+    EEPROM.write(3, highByte(T1_Cal_Max));
+    EEPROM.write(4, lowByte(T1_Cal_Max));
+    EEPROM.write(5, highByte(T2_Cal_Min));
+    EEPROM.write(6, lowByte(T2_Cal_Min));
+    EEPROM.write(7, highByte(T2_Cal_Max));
+    EEPROM.write(8, lowByte(T2_Cal_Max));
+    EEPROM.write(0, 0); //It has been calibrated, make sure it atores that
+  }else{ //Otherwise the calibration is good and it doesnt need to be calibrated
+    byte T1_Cal_Min_High = EEPROM.read(1);
+    byte T1_Cal_Min_Low = EEPROM.read(2);
+    byte T1_Cal_Max_High = EEPROM.read(3);
+    byte T1_Cal_Max_Low = EEPROM.read(4);
+    byte T2_Cal_Min_High = EEPROM.read(5);
+    byte T2_Cal_Min_Low = EEPROM.read(6);
+    byte T2_Cal_Max_High = EEPROM.read(7);
+    byte T2_Cal_Max_Low = EEPROM.read(8);
 
-    if (Throttle_2_Value < T2_Cal_Min) {
-      T2_Cal_Min = Throttle_2_Value;
-    } else if (Throttle_2_Value > T2_Cal_Max) {
-      T2_Cal_Max = Throttle_2_Value;
-    }
+    T1_Cal_Min = T1_Cal_Min_High << 8;
+    T1_Cal_Min |= T1_Cal_Min_Low;
+    
+    T1_Cal_Max = T1_Cal_Max_High << 8;
+    T1_Cal_Max |= T1_Cal_Max_Low;
+    
+    T2_Cal_Min = T2_Cal_Min_High << 8;
+    T2_Cal_Min |= T2_Cal_Min_Low;
+    
+    T2_Cal_Max = T2_Cal_Max_High << 8;
+    T2_Cal_Max |= T2_Cal_Max_Low;
   }
-
+  
   Controller_Status = 0;
 }
 
@@ -129,7 +175,7 @@ void loop() {
     } else {
       Controller_Status = 7;
     }
-  }else if(abs(Throttle_1_Value - Throttle_2_Value) > Tolerance) { //Check the throttle values are within tolerance of each other
+  } else if (abs(Throttle_1_Value - Throttle_2_Value) > Tolerance) { //Check the throttle values are within tolerance of each other
     fault = 1; //Hold onto the fault until a reset command is sent
     Controller_Status = 1; //Throw a fault code telling that the tolerancing has not been met
   } else { //Otherwise, it is safe to send the throttle to the main controller
